@@ -1,0 +1,10 @@
+2026-08-01 10:15:23 INFO User login successful - user123
+2026-08-01 10:16:01 ERROR Database connection failed
+2026-08-01 10:16:05 WARNING High memory usage detected
+2026-08-01 10:17:12 INFO User login successful - user456
+2026-08-01 10:18:45 ERROR Database connection failed
+2026-08-01 10:19:02 ERROR File not found: config.yaml
+2026-08-01 10:20:11 INFO User logout - user123
+2026-08-01 10:21:33 WARNING High memory usage detected
+2026-08-01 10:22:15 ERROR Database connection failed
+2026-08-01 10:23:01 INFO User login successful - user789
