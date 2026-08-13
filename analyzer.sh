@@ -1,7 +1,21 @@
 #!/bin/bash
-echo "----- Log File Analyzer -----"
 
-log_file="sample.log"
+if [ -z "$1" ]; then
+  echo "Usage: bash analyzer.sh <logfile>"
+  echo "Example: bash analyzer.sh sample.log"
+  exit 1
+fi
+
+log_file="$1"
+
+if [ ! -f "$log_file" ]; then
+  echo "ERROR: File '$log_file' not found."
+  exit 1
+fi
+
+echo "----- Log File Analyzer -----"
+echo "Analyzing: $log_file"
+echo ""
 
 echo "Total lines: $(wc -l < "$log_file")"
 echo "ERROR count: $(grep -c "ERROR" "$log_file")"
