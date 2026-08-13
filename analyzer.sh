@@ -25,3 +25,12 @@ echo "INFO count: $(grep -c "INFO" "$log_file")"
 echo ""
 echo "----- Most Common ERROR Messages -----"
 grep "ERROR" "$log_file" | sed 's/^.*ERROR //' | sort | uniq -c | sort -rn | head -5
+
+echo ""
+echo "----- Error Spike Check -----"
+error_count=$(grep -c "ERROR" "$log_file")
+if [ "$error_count" -ge 3 ]; then
+  echo "WARNING: $error_count errors found - possible incident, review needed."
+else
+  echo "Error count normal ($error_count errors)."
+fi
