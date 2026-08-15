@@ -5,6 +5,17 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+if [ "$1" == "--help" ]; then
+  echo "Usage: bash analyzer.sh <logfile>"
+  echo ""
+  echo "Options:"
+  echo "  --help          Show this help message"
+  echo "  <logfile>       Analyze the specified log file"
+  echo ""
+  echo "Example: bash analyzer.sh sample.log"
+  exit 0
+fi
+
 if [ -z "$1" ]; then
   echo "Usage: bash analyzer.sh <logfile>"
   echo "Example: bash analyzer.sh sample.log"
