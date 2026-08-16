@@ -29,27 +29,35 @@ if [ ! -f "$log_file" ]; then
   exit 1
 fi
 
-echo "----- Log File Analyzer -----"
-echo "Analyzing: $log_file"
+report_file="report_$(date +%Y-%m-%d_%H-%M-%S).txt"
+
+{
+  echo "----- Log File Analyzer -----"
+  echo "Analyzing: $log_file"
+  echo "Report generated: $(date)"
+  echo ""
+
+  error_count=$(grep -c "ERROR" "$log_file")
+  warning_count=$(grep -c "WARNING" "$log_file")
+  info_count=$(grep -c "INFO" "$log_file")
+
+  echo "Total lines: $(wc -l < "$log_file")"
+  echo "ERROR count: $error_count"
+  echo "WARNING count: $warning_count"
+  echo "INFO count: $info_count"
+
+  echo ""
+  echo "----- Most Common ERROR Messages -----"
+  grep "ERROR" "$log_file" | sed 's/^.*ERROR //' | sort | uniq -c | sort -rn | head -5
+
+  echo ""
+  echo "----- Error Spike Check -----"
+  if [ "$error_count" -ge 3 ]; then
+    echo "WARNING: $error_count errors found - possible incident, review needed."
+  else
+    echo "Error count normal ($error_count errors)."
+  fi
+} | tee "$report_file"
+
 echo ""
-
-error_count=$(grep -c "ERROR" "$log_file")
-warning_count=$(grep -c "WARNING" "$log_file")
-info_count=$(grep -c "INFO" "$log_file")
-
-echo "Total lines: $(wc -l < "$log_file")"
-echo -e "${RED}ERROR count: $error_count${NC}"
-echo -e "${YELLOW}WARNING count: $warning_count${NC}"
-echo -e "${GREEN}INFO count: $info_count${NC}"
-
-echo ""
-echo "----- Most Common ERROR Messages -----"
-grep "ERROR" "$log_file" | sed 's/^.*ERROR //' | sort | uniq -c | sort -rn | head -5
-
-echo ""
-echo "----- Error Spike Check -----"
-if [ "$error_count" -ge 3 ]; then
-  echo -e "${RED}WARNING: $error_count errors found - possible incident, review needed.${NC}"
-else
-  echo -e "${GREEN}Error count normal ($error_count errors).${NC}"
-fi
+echo "Report saved to: $report_file"
