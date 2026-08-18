@@ -22,6 +22,16 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+search_term=""
+if [ "$1" == "--search" ]; then
+  search_term="$2"
+  shift 2
+  if [ -z "$search_term" ]; then
+    echo "ERROR: --search requires a keyword. Example: bash analyzer.sh --search timeout sample.log"
+    exit 1
+  fi
+fi
+
 report_file="report_$(date +%Y-%m-%d_%H-%M-%S).txt"
 total_errors=0
 total_warnings=0
@@ -55,6 +65,12 @@ total_info=0
     echo ""
     echo "Most Common ERROR Messages:"
     grep "ERROR" "$log_file" | sed 's/^.*ERROR //' | sort | uniq -c | sort -rn | head -5
+
+    if [ -n "$search_term" ]; then
+      echo ""
+      echo "Lines matching '$search_term':"
+      grep -i "$search_term" "$log_file" || echo "  (no matches found)"
+    fi
   done
 
   echo ""
