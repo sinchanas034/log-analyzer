@@ -10,6 +10,7 @@ if [ "$1" == "--help" ]; then
   echo ""
   echo "Options:"
   echo "  --help          Show this help message"
+  echo "  --search <word> Filter lines matching a keyword"
   echo "  <logfile>       Analyze one or more specified log files"
   echo ""
   echo "Example: bash analyzer.sh sample.log sample2.log"
@@ -33,9 +34,30 @@ if [ "$1" == "--search" ]; then
 fi
 
 report_file="report_$(date +%Y-%m-%d_%H-%M-%S).txt"
+html_file="report_$(date +%Y-%m-%d_%H-%M-%S).html"
 total_errors=0
 total_warnings=0
 total_info=0
+
+cat > "$html_file" << HTMLSTART
+<html>
+<head>
+<title>Log Analysis Report</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
+h1 { color: #333; }
+table { border-collapse: collapse; width: 100%; background: white; margin-bottom: 20px; }
+th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+th { background: #333; color: white; }
+.error { color: red; font-weight: bold; }
+.warning { color: #b8860b; font-weight: bold; }
+.info { color: green; }
+</style>
+</head>
+<body>
+<h1>Log Analysis Report</h1>
+<p>Generated: $(date)</p>
+HTMLSTART
 
 {
   echo "----- Log File Analyzer -----"
@@ -71,6 +93,14 @@ total_info=0
       echo "Lines matching '$search_term':"
       grep -i "$search_term" "$log_file" || echo "  (no matches found)"
     fi
+
+    echo "<h2>$log_file</h2>" >> "$html_file"
+    echo "<table><tr><th>Metric</th><th>Count</th></tr>" >> "$html_file"
+    echo "<tr><td>Total lines</td><td>$(wc -l < "$log_file")</td></tr>" >> "$html_file"
+    echo "<tr><td class='error'>ERROR</td><td>$error_count</td></tr>" >> "$html_file"
+    echo "<tr><td class='warning'>WARNING</td><td>$warning_count</td></tr>" >> "$html_file"
+    echo "<tr><td class='info'>INFO</td><td>$info_count</td></tr>" >> "$html_file"
+    echo "</table>" >> "$html_file"
   done
 
   echo ""
@@ -88,5 +118,12 @@ total_info=0
   fi
 } | tee "$report_file"
 
-echo ""
+echo "<h2>Combined Summary</h2>" >> "$html_file"
+echo "<table><tr><th>Metric</th><th>Total</th></tr>" >> "$html_file"
+echo "<tr><td class='error'>ERROR</td><td>$total_errors</td></tr>" >> "$html_file"
+echo "<tr><td class='warning'>WARNING</td><td>$total_warnings</td></tr>" >> "$html_file"
+echo "<tr><td class='info'>INFO</td><td>$total_info</td></tr>" >> "$html_file"
+echo "</table></body></html>" >> "$html_file"
+
 echo "Report saved to: $report_file"
+echo "HTML report saved to: $html_file"
